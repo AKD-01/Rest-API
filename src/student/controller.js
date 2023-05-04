@@ -23,7 +23,6 @@ const addStudent = (req, res) => {
     if (results.rows.length) {
       res.send("Email already exists.");
     }
-
     //add student to db
     else {
       pool.query(
@@ -38,8 +37,24 @@ const addStudent = (req, res) => {
   });
 };
 
+const removeStudent = (req, res) => {
+  const id = parseInt(req.params.id);
+  pool.query(queries.getStudentsById, [id], (error, results) => {
+    const noStudentFound = !results.rows.length;
+    if (noStudentFound) {
+      res.send("Student doesn't exist in the database");
+    } else {
+      pool.query(queries.removeStudent, [id], (error, results) => {
+        if (error) throw error;
+        res.status(200).send("Student Deleted Successfully!");
+      });
+    }
+  });
+};
+
 module.exports = {
   getStudents,
   getStudentsById,
   addStudent,
+  removeStudent,
 };
